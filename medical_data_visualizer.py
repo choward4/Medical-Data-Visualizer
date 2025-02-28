@@ -37,13 +37,11 @@ def draw_cat_plot():
     df_cat = df_cat.drop_duplicates().sort_values(by=['cardio', 'variable'])
     df_cat['total'] = totals
     
-    # 7 TODO
-
-
+    # 7 TODO convert to long
 
     # 8
+    fig, ax = plt.subplots(figsize=(8,8))
     fig = sns.catplot(data=df_cat, x='variable', y='total', hue='value', col='cardio', kind='bar')
-
 
     # 9
     fig.savefig('catplot.png')
@@ -53,22 +51,28 @@ def draw_cat_plot():
 # 10
 def draw_heat_map():
     # 11
-    df_heat = None
+    df_heat = df[df['ap_lo'] <= df['ap_hi']]
+
+    for col in ('height', 'weight'):
+        df_heat = df_heat[df_heat[col] >= df_heat[col].quantile(0.025)]
+        df_heat = df_heat[df_heat[col] <= df_heat[col].quantile(0.975)]
 
     # 12
-    corr = None
+    corr = df_heat.corr()
 
     # 13
-    mask = None
-
-
+    size = corr.index.size
+    m = np.ones((size,size), dtype=bool)
+    for i in range(size):
+        m[i][:i] = False
+    mask = m
 
     # 14
-    fig, ax = None
+    fig, ax = plt.subplots(figsize=(8,8))
+    ax.set_title("Correlation")
 
     # 15
-
-
+    ax = sns.heatmap(corr, mask=mask, annot=True, linewidth=.5, center=0.0, vmax=0.3, square=True, fmt='.1f')
 
     # 16
     fig.savefig('heatmap.png')
