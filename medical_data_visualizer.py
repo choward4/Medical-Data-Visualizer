@@ -3,8 +3,6 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import numpy as np
 
-pd.set_option('future.no_silent_downcasting', True)
-
 # 1
 df = pd.read_csv('medical_examination.csv')
 
@@ -13,8 +11,9 @@ df['overweight'] = df['weight'] / ((df['height'] / 100) ** 2) > 25
 df['overweight'] = df['overweight'].replace([True, False], [1, 0])
 
 # 3 Normalize
-df['cholesterol'] = df['cholesterol'].replace([1,2,3], [0,1,1])
-df['gluc'] = df['gluc'].replace([1,2,3], [0,1,1])
+# TODO Test if .apply() is faster
+for col in ('gluc', 'cholesterol'):
+    df[col] = df[col].apply(lambda x : 0 if x == 1 else 1)
 
 # 4
 def draw_cat_plot():
